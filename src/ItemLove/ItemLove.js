@@ -103,7 +103,7 @@ function FallingHearts() {
                 zIndex: zIndexCounter,
             };
 
-            setZIndexCounter((prev) => prev + 1); // tăng zIndex mỗi lần tạo
+            setZIndexCounter((prev) => prev + 1);
 
             setItems((prev) => [...prev, newItem]);
 
