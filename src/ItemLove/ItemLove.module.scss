@@ -60,9 +60,17 @@
         transform: scale(1.2);
     }
 }
+.falling-image {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    box-shadow: 0 0 15px pink;
+    animation: float 6s ease-in;
+}
 /* Responsive text size */
 @media (max-width: 768px) {
     .falling {
-        font-size: 1.9rem;
+        font-size: 2.2rem;
     }
 }

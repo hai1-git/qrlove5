@@ -5,28 +5,33 @@ import classNames from "classnames/bind";
 const cx = classNames.bind(styles);
 
 const hearts = ["💖", "❤️", "💘", "💕", "🩷", "❤️‍🔥"];
-const name = "Nguyễn Ngọc Phương Trinh";
+const name = "Đặng Thu Nguyệt❤️Nguyễn Ngọc Hưng";
 const messages = [
-    "nhớ cậu quá đi 🥹",
-    "cậu ăn gì chưa 🤤",
-    "cậu đang làm gì đó 🩵",
-    "nhớ đi ngủ sớm nha 🥱",
+    "Ai lớp diu chu cà mo 🫶",
+    "Em yêu anh ❤️",
+    "Cảm ơn vì anh đã đến 🥰",
 ];
-//
+
+// Danh sách ảnh
+const images = [
+    "/assets/imgs/avt1.jpg",
+    "/assets/imgs/avt2.jpg",
+    "/assets/imgs/avt3.jpg",
+];
+
 function FallingHearts() {
     const containerRef = useRef(null);
+    const audioRef = useRef(null);
     const [zIndexCounter, setZIndexCounter] = useState(1);
-
     const [items, setItems] = useState([]);
     const [stars, setStars] = useState([]);
-    const audioRef = useRef(null);
 
+    // Hiệu ứng xoay theo chuột
     useEffect(() => {
         const handleMouseMove = (e) => {
             const { innerWidth, innerHeight } = window;
             const x = (e.clientX / innerWidth - 0.5) * 2;
             const y = (e.clientY / innerHeight - 0.5) * 2;
-
             const rotateX = y * -30;
             const rotateY = x * 30;
 
@@ -49,6 +54,7 @@ function FallingHearts() {
         };
     }, []);
 
+    // Phát nhạc nền
     useEffect(() => {
         const audio = audioRef.current;
 
@@ -58,32 +64,26 @@ function FallingHearts() {
             document.removeEventListener("click", enableAudio);
         };
 
-        // Một số trình duyệt sẽ chặn autoplay có âm thanh
-        // Cần người dùng click để kích hoạt
         document.addEventListener("click", enableAudio);
-
-        // Tự phát khi load (nếu trình duyệt cho phép)
-        audio.play().catch(() => {
-            // Nếu bị chặn, chờ user click như trên
-        });
-
+        audio.play().catch(() => {});
         return () => {
             document.removeEventListener("click", enableAudio);
         };
     }, []);
 
+    // Tạo sao lấp lánh
     useEffect(() => {
-        // tạo sao lấp lánh
         const generatedStars = Array.from({ length: 40 }, () => ({
             id: Math.random(),
             top: Math.random() * 100,
             left: Math.random() * 100,
-            size: Math.random() * 4 + 2, // từ 2px đến 6px
+            size: Math.random() * 4 + 2,
             delay: Math.random() * 5,
         }));
         setStars(generatedStars);
     }, []);
 
+    // Tạo hiệu ứng rơi chữ (tên hoặc message)
     useEffect(() => {
         const interval = setInterval(() => {
             const left = Math.random() * 90;
@@ -104,7 +104,6 @@ function FallingHearts() {
             };
 
             setZIndexCounter((prev) => prev + 1);
-
             setItems((prev) => [...prev, newItem]);
 
             setTimeout(() => {
@@ -117,6 +116,38 @@ function FallingHearts() {
         return () => clearInterval(interval);
     }, []);
 
+    // Tạo hiệu ứng rơi ảnh random
+    useEffect(() => {
+        let timeoutId;
+
+        const createRandomImageFall = () => {
+            const image = images[Math.floor(Math.random() * images.length)];
+
+            const newImageItems = Array.from({ length: 3 }).map(() => ({
+                id: Date.now() + Math.random(),
+                left: Math.random() * 90,
+                content: image,
+                type: "image",
+                zIndex: zIndexCounter,
+            }));
+
+            setZIndexCounter((prev) => prev + 3);
+            setItems((prev) => [...prev, ...newImageItems]);
+
+            newImageItems.forEach((item) => {
+                setTimeout(() => {
+                    setItems((prev) => prev.filter((i) => i.id !== item.id));
+                }, 6000);
+            });
+
+            const randomDelay = Math.random() * 3000 + 1000;
+            timeoutId = setTimeout(createRandomImageFall, randomDelay);
+        };
+
+        createRandomImageFall();
+        return () => clearTimeout(timeoutId);
+    }, []);
+
     return (
         <div ref={containerRef} className={cx("container")}>
             <audio
@@ -127,7 +158,7 @@ function FallingHearts() {
                 muted
             />
 
-            {/* Các sao lấp lánh */}
+            {/* Sao lấp lánh */}
             {stars.map((star) => (
                 <div
                     key={star.id}
@@ -142,13 +173,22 @@ function FallingHearts() {
                 />
             ))}
 
+            {/* Hiệu ứng rơi chữ và ảnh */}
             {items.map((item) => (
                 <span
                     key={item.id}
                     className={cx("falling", item.type)}
                     style={{ left: `${item.left}%`, zIndex: item.zIndex }}
                 >
-                    {item.content}
+                    {item.type === "image" ? (
+                        <img
+                            src={item.content}
+                            alt="falling-img"
+                            className={cx("falling-image")}
+                        />
+                    ) : (
+                        item.content
+                    )}
                 </span>
             ))}
         </div>
