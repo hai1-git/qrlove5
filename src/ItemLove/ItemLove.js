@@ -5,7 +5,7 @@ import classNames from "classnames/bind";
 const cx = classNames.bind(styles);
 
 const hearts = ["💖", "❤️", "💘", "💕", "🩷", "❤️‍🔥"];
-const name = "Nguyễn Phương Trinh";
+const name = "Nguyễn Ngọc Phương Trinh";
 const messages = [
     "nhớ cậu quá đi 🥹",
     "cậu ăn gì chưa 🤤",
@@ -14,9 +14,40 @@ const messages = [
 ];
 
 function FallingHearts() {
+    const containerRef = useRef(null);
+    const [zIndexCounter, setZIndexCounter] = useState(1);
+
     const [items, setItems] = useState([]);
     const [stars, setStars] = useState([]);
     const audioRef = useRef(null);
+
+    useEffect(() => {
+        const handleMouseMove = (e) => {
+            const { innerWidth, innerHeight } = window;
+            const x = (e.clientX / innerWidth - 0.5) * 2;
+            const y = (e.clientY / innerHeight - 0.5) * 2;
+
+            const rotateX = y * -30;
+            const rotateY = x * 30;
+
+            if (containerRef.current) {
+                containerRef.current.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+            }
+        };
+
+        const resetRotation = () => {
+            if (containerRef.current) {
+                containerRef.current.style.transform = `rotateX(0deg) rotateY(0deg)`;
+            }
+        };
+
+        window.addEventListener("mousemove", handleMouseMove);
+        window.addEventListener("mouseleave", resetRotation);
+        return () => {
+            window.removeEventListener("mousemove", handleMouseMove);
+            window.removeEventListener("mouseleave", resetRotation);
+        };
+    }, []);
 
     useEffect(() => {
         const audio = audioRef.current;
@@ -68,7 +99,11 @@ function FallingHearts() {
                 id: Date.now() + Math.random(),
                 left,
                 content,
+                type,
+                zIndex: zIndexCounter,
             };
+
+            setZIndexCounter((prev) => prev + 1); // tăng zIndex mỗi lần tạo
 
             setItems((prev) => [...prev, newItem]);
 
@@ -83,7 +118,7 @@ function FallingHearts() {
     }, []);
 
     return (
-        <div className={cx("container")}>
+        <div ref={containerRef} className={cx("container")}>
             <audio
                 ref={audioRef}
                 src="/assets/music/iumatroi.mp3"
@@ -111,7 +146,7 @@ function FallingHearts() {
                 <span
                     key={item.id}
                     className={cx("falling", item.type)}
-                    style={{ left: `${item.left}%` }}
+                    style={{ left: `${item.left}%`, zIndex: item.zIndex }}
                 >
                     {item.content}
                 </span>

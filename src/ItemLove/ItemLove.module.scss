@@ -7,6 +7,10 @@
     pointer-events: none;
     overflow: hidden;
     z-index: 9999;
+    perspective: 1000px;
+    transform-style: preserve-3d;
+    will-change: transform;
+    transition: transform 0.2s ease-out;
 }
 
 .falling {
@@ -59,6 +63,6 @@
 /* Responsive text size */
 @media (max-width: 768px) {
     .falling {
-        font-size: 1.8rem;
+        font-size: 1.9rem;
     }
 }
