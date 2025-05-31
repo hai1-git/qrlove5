@@ -79,7 +79,7 @@ function FallingHearts() {
             top: Math.random() * 100,
             left: Math.random() * 100,
             size: Math.random() * 4 + 2, // từ 2px đến 6px
-            delay: Math.random() * 5, // animation delay
+            delay: Math.random() * 5,
         }));
         setStars(generatedStars);
     }, []);
