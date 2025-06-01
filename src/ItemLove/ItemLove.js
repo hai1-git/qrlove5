@@ -4,12 +4,11 @@ import classNames from "classnames/bind";
 
 const cx = classNames.bind(styles);
 
-const hearts = ["💖", "❤️", "💘", "💕", "🩷", "❤️‍🔥"];
-const name = "Đặng Thu Nguyệt❤️Nguyễn Ngọc Hưng";
 const messages = [
-    "Ai lớp diu chu cà mo 🫶",
-    "Em yêu anh ❤️",
-    "Cảm ơn vì anh đã đến 🥰",
+    "I love you so much 🫶",
+    "Anh yêu em ❤️",
+    "Em bé xinh đẹp 🥰",
+    "Tình yêu to bự 🥰",
 ];
 
 // Danh sách ảnh
@@ -17,6 +16,15 @@ const images = [
     "/assets/imgs/avt1.jpg",
     "/assets/imgs/avt2.jpg",
     "/assets/imgs/avt3.jpg",
+    "/assets/imgs/avt4.jpg",
+    "/assets/imgs/avt5.jpg",
+    "/assets/imgs/avt6.jpg",
+    "/assets/imgs/avt7.jpg",
+    "/assets/imgs/avt8.jpg",
+    "/assets/imgs/avt9.jpg",
+    "/assets/imgs/avt10.jpg",
+    "/assets/imgs/avt11.jpg",
+    "/assets/imgs/avt12.jpg",
 ];
 
 function FallingHearts() {
@@ -32,7 +40,7 @@ function FallingHearts() {
             const { innerWidth, innerHeight } = window;
             const x = (e.clientX / innerWidth - 0.5) * 2;
             const y = (e.clientY / innerHeight - 0.5) * 2;
-            const rotateX = y * -30;
+            const rotateX = y * 30;
             const rotateY = x * 30;
 
             if (containerRef.current) {
@@ -87,19 +95,14 @@ function FallingHearts() {
     useEffect(() => {
         const interval = setInterval(() => {
             const left = Math.random() * 90;
-            const heart = hearts[Math.floor(Math.random() * hearts.length)];
-            const type = Math.random() < 0.5 ? "name" : "message";
 
             const content =
-                type === "name"
-                    ? `${name} ${heart}`
-                    : messages[Math.floor(Math.random() * messages.length)];
+                messages[Math.floor(Math.random() * messages.length)];
 
             const newItem = {
                 id: Date.now() + Math.random(),
                 left,
                 content,
-                type,
                 zIndex: zIndexCounter,
             };
 
@@ -116,35 +119,38 @@ function FallingHearts() {
         return () => clearInterval(interval);
     }, []);
 
-    // Tạo hiệu ứng rơi ảnh random
+    // Tạo hiệu ứng rơi ảnh random (mỗi lần chỉ rơi 1 ảnh)
     useEffect(() => {
         let timeoutId;
 
         const createRandomImageFall = () => {
             const image = images[Math.floor(Math.random() * images.length)];
 
-            const newImageItems = Array.from({ length: 3 }).map(() => ({
+            const newImageItem = {
                 id: Date.now() + Math.random(),
                 left: Math.random() * 90,
                 content: image,
                 type: "image",
                 zIndex: zIndexCounter,
-            }));
+            };
 
-            setZIndexCounter((prev) => prev + 3);
-            setItems((prev) => [...prev, ...newImageItems]);
+            setZIndexCounter((prev) => prev + 1);
+            setItems((prev) => [...prev, newImageItem]);
 
-            newImageItems.forEach((item) => {
-                setTimeout(() => {
-                    setItems((prev) => prev.filter((i) => i.id !== item.id));
-                }, 6000);
-            });
+            // Xóa ảnh sau 6 giây
+            setTimeout(() => {
+                setItems((prev) =>
+                    prev.filter((i) => i.id !== newImageItem.id)
+                );
+            }, 6000);
 
+            // Gọi tiếp rơi ảnh với độ trễ ngẫu nhiên
             const randomDelay = Math.random() * 3000 + 1000;
             timeoutId = setTimeout(createRandomImageFall, randomDelay);
         };
 
         createRandomImageFall();
+
         return () => clearTimeout(timeoutId);
     }, []);
 
